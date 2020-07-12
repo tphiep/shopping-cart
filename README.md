@@ -12,9 +12,10 @@ Sample micro services
 # System 
   >![Preview](https://raw.githubusercontent.com/tphiep/shopping-cart/master/design.png)
 # Schema
-   ####Product
+   ## Product
    >![Preview](https://raw.githubusercontent.com/tphiep/shopping-cart/master/product_schema.jpg)
-   ####Order
+   
+   ## Order
    >![Preview](https://raw.githubusercontent.com/tphiep/shopping-cart/master/order_schema.jpg)
 # Sample Request/Response
    1. Product Service:
