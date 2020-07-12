@@ -18,7 +18,7 @@ Sample micro services
    >![Preview](https://raw.githubusercontent.com/tphiep/shopping-cart/master/order_schema.jpg)
 # Sample Request/Response
    1. Product Service:
-      #####Create Product:
+      <br>*Create Product*
       ```shell script
         curl -d '{"info" : {"name": "P1", "price": 100, "quantity": 3}}' -H "Content-Type: application/json" -X POST http://localhost:8082/products
         {"productId":1}
@@ -27,7 +27,7 @@ Sample micro services
         {"productId":3}
       ```
    2. Order Service:
-      #####Create Order
+      <br>*Create Order*
       ```shell script
         curl -d '{"customerId" : 1, "items": [{"productId": 1, "amount": 1, "price": 100}, {"productId": 3, "price": 200, "amount": 1}]}' -H "Content-Type: application/json" -X POST http://localhost:8084/orders
         {"orderId":1}
@@ -35,7 +35,7 @@ Sample micro services
         curl -d '{"customerId" : 1, "items": [{"productId": 1, "amount": 100, "price": 100}, {"productId": 3, "price": 200, "amount": 1}]}' -H "Content-Type: application/json" -X POST http://localhost:8084/orders
         {"orderId":3}
       ```
-      ######Get Order Status
+      *Get Order Status*
       ```shell script
           curl -H "Content-Type: application\json" -X GET http://localhost:8084/orders/1
           {"customerId":1,"itemLines":[{"productId":1,"amount":1,"price":100.00},{"productId":3,"amount":1,"price":200.00}],"orderId":1,"state":"APPROVED"}
