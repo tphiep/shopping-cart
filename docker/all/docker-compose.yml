@@ -1,0 +1,87 @@
+version: '2'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:5.2.4
+    ports:
+      - 2181:2181
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      KAFKA_HEAP_OPTS: -Xmx128m
+
+  kafka:
+    image: "confluentinc/cp-kafka:5.2.4"
+    ports:
+      - 9092:9092
+      - 29092:29092
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_LISTENERS: LC://kafka:29092,LX://kafka:9092
+      KAFKA_ADVERTISED_LISTENERS: LC://kafka:29092,LX://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: LC:PLAINTEXT,LX:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: LC
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_HEAP_OPTS: -Xmx256m
+
+  mysql:
+    image: eventuateio/eventuate-tram-sagas-mysql:0.13.0.RELEASE
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_USER=mysqluser
+      - MYSQL_PASSWORD=mysqlpw
+
+  cdcservice:
+    image: eventuateio/eventuate-cdc-service:0.6.1.RELEASE
+    ports:
+      - "8099:8080"
+    depends_on:
+      - mysql
+      - kafka
+      - zookeeper
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql/eventuate
+      SPRING_DATASOURCE_USERNAME: mysqluser
+      SPRING_DATASOURCE_PASSWORD: mysqlpw
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.jdbc.Driver
+      EVENTUATELOCAL_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      EVENTUATELOCAL_ZOOKEEPER_CONNECTION_STRING: zookeeper:2181
+      EVENTUATELOCAL_CDC_DB_USER_NAME: root
+      EVENTUATELOCAL_CDC_DB_PASSWORD: root
+      EVENTUATELOCAL_CDC_READER_NAME: MySqlReader
+      EVENTUATELOCAL_CDC_OFFSET_STORE_KEY: MySqlBinlog
+      EVENTUATELOCAL_CDC_MYSQL_BINLOG_CLIENT_UNIQUE_ID: 1234567890
+      EVENTUATELOCAL_CDC_READ_OLD_DEBEZIUM_DB_OFFSET_STORAGE_TOPIC: "false"
+      JAVA_OPTS: -Xmx128m
+  orderservice:
+      image: example/shopping-cart-ordersrv:0.0.1
+      ports:
+        - "8084:8084"
+      depends_on:
+        - mysql
+        - kafka
+        - zookeeper
+      environment:
+        PROFILE: "default"
+        SERVER_PORT: "8084"
+        DATABASE_PORT:     3306
+        MYSQL:     "mysql"
+        KAFKA:     "kafka"
+        ZOOKEEPER: "zookeeper"
+  productservice:
+    image: example/shopping-cart-productsrv:0.0.1
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mysql
+      - kafka
+      - zookeeper
+    environment:
+      PROFILE: "default"
+      SERVER_PORT: "8082"
+      DATABASE_PORT:     3306
+      MYSQL:     "mysql"
+      KAFKA:     "kafka"
+      ZOOKEEPER: "zookeeper"

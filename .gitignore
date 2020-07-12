@@ -1,0 +1,9 @@
+.idea/
+order-service/target/
+product-service/target/
+customer-service/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
+customer-service/target/
+common/target/
+common/common.iml
+order-service/orderserver.iml
+product-service/productserver.iml

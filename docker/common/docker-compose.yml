@@ -1,0 +1,110 @@
+version: '2'
+services:
+  eurekaserver:
+     image:   example/shopping-cart-eurekasvr:0.0.1
+     ports:
+         - "8761:8761"
+  configserver:
+      image: example/shopping-cart-confsvr:0.0.1
+      ports:
+         - "8888:8888"
+      environment:
+         EUREKASERVER_PORT: 8761
+         EUREKASERVER_URI: "http://eurekaserver:8761/eureka/"
+         ENCRYPT_KEY:       "IMSYMMETRIC"
+  zuulserver:
+      image: example/shopping-car-zuulsvr:0.0.1
+      ports:
+        - "5555:5555"
+      environment:
+        PROFILE: "default"
+        SERVER_PORT: "5555"
+        CONFIGSERVER_PORT: 8888
+        EUREKASERVER_PORT: 8761
+        CONFIGSERVER_URI: "http://configserver:8888"
+        EUREKASERVER_URI: "http://eurekaserver:8761/eureka/"
+  productdatabase:
+      image: mysql:5.7
+      ports:
+        - "3382:3306"
+      environment:
+        - MYSQL_DATABASE=product_local
+        - MYSQL_USER=user
+        - MYSQL_PASSWORD=password
+        - MYSQL_ROOT_PASSWORD=password
+  orderdatabase:
+    image: mysql:5.7
+    ports:
+      - "3384:3306"
+    environment:
+      - MYSQL_DATABASE=order_local
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=password
+  customerdatabase:
+    image: mysql:5.7
+    ports:
+      - "3383:3306"
+    environment:
+      - MYSQL_DATABASE=product_local
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=password
+  productservice:
+      image: example/shopping-cart-productsrv:0.0.1
+      ports:
+        - "8082:8082"
+      environment:
+        PROFILE: "default"
+        SERVER_PORT: "8082"
+        ES_PORT:           9200
+        DATABASE_PORT:     5432
+        CONFIGSERVER_PORT: 8888
+        EUREKASERVER_PORT: 8761
+        AUTHSERVER_PORT:   8091
+        CONFIGSERVER_URI: "http://configserver:8888"
+        EUREKASERVER_URI: "http://eurekaserver:8761/eureka/"
+#        AUTHSERVER_URI:   "http://authenticationservice:8901/auth/user"
+        ENCRYPT_KEY:       "IMSYMMETRIC"
+  customerservice:
+      image: example/shopping-cart-customersrv:0.0.1
+      ports:
+        - "8083:8083"
+      environment:
+        PROFILE: "default"
+        SERVER_PORT: "8083"
+        DATABASE_PORT:     5432
+        CONFIGSERVER_PORT: 8888
+        EUREKASERVER_PORT: 8761
+        AUTHSERVER_PORT:   8091
+        CONFIGSERVER_URI: "http://configserver:8888"
+        EUREKASERVER_URI: "http://eurekaserver:8761/eureka/"
+#        AUTHSERVER_URI:   "http://authenticationservice:8901/auth/user"
+        ENCRYPT_KEY:       "IMSYMMETRIC"
+  orderservice:
+    image: example/shopping-cart-ordersrv:0.0.1
+    ports:
+      - "8084:8084"
+    environment:
+      PROFILE: "default"
+      SERVER_PORT: "8804"
+      DATABASE_PORT:     5432
+      CONFIGSERVER_PORT: 8888
+      EUREKASERVER_PORT: 8761
+      CONFIGSERVER_URI: "http://configserver:8888"
+      EUREKASERVER_URI: "http://eurekaserver:8761/eureka/"
+#      AUTHSERVER_URI:   "http://authenticationservice:8901/auth/user"
+      ENCRYPT_KEY:       "IMSYMMETRIC"
+#  authenticationservice:
+#      image: example/shopping-cart-authenticationsrv:0.0.1
+#      ports:
+#        - "8901:8901"
+#      environment:
+#        PROFILE: "default"
+#        SERVER_PORT: "8901"
+#        DATABASE_PORT:     5432
+#        CONFIGSERVER_PORT: 8888
+#        EUREKASERVER_PORT: 8761
+#        CONFIGSERVER_URI: "http://configserver:8888"
+#        EUREKASERVER_URI: "http://eurekaserver:8761/eureka/"
+#        ENCRYPT_KEY:       "IMSYMMETRIC"
